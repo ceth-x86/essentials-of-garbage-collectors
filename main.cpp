@@ -182,12 +182,17 @@ Block *bestFit(size_t size) {
 
 // Explicit free-list algorithm.
 Block *freeList(size_t size) {
+    Block* foundBlock = nullptr;
     for (const auto &block : free_list) {
-        if (block->size < size) {
-            continue;
+        if (block->size >= size) {
+            foundBlock = block;
+            break;
         }
-        free_list.remove(block);
-        return listAllocate(block, size);
+    }
+
+    if (foundBlock != nullptr) {
+        free_list.remove(foundBlock);
+        return listAllocate(foundBlock, size);
     }
     return nullptr;
 }
@@ -510,10 +515,10 @@ int main(int argc, char const *argv[]) {
     printBlocks();
 
     // TODO: something broken here
-    //auto v2 = alloc(16);
-    //assert(free_list.size() == 0);
-    //assert(getHeader(v1) == getHeader(v2));
-    //printBlocks();
+    auto v2 = alloc(16);
+    assert(free_list.size() == 0);
+    assert(getHeader(v1) == getHeader(v2));
+    printBlocks();
 
 
     // Segregated-fit search
